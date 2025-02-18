@@ -8,6 +8,7 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -19,31 +20,92 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+        }
+        button:disabled {
+            background-color: #ccc;
         }
     </style>
 </head>
 <body>
-    <div id="countdown">Loading...</div>
+    <div id="countdown">3:00</div>
+    <div class="buttons">
+        <button id="start">Start</button>
+        <button id="stop" disabled>Stop</button>
+        <button id="reset">Reset</button>
+        <button id="settings">Settings</button>
+    </div>
     <script>
-        function startCountdown(targetDate) {
-            function updateCountdown() {
-                const now = new Date().getTime();
-                const distance = targetDate - now;
-                if (distance < 0) {
-                    document.getElementById("countdown").innerHTML = "Countdown Ended!";
-                    return;
-                }
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                document.getElementById("countdown").innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-            }
-            updateCountdown();
-            setInterval(updateCountdown, 1000);
+        let countdownTime = 180;
+        let timeRemaining = countdownTime;
+        let interval;
+
+        function updateCountdown() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById("countdown").innerHTML = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
         }
-        const targetDate = new Date("2025-01-01T00:00:00").getTime(); // Change date here
-        startCountdown(targetDate);
+
+        function startCountdown() {
+            if (interval) return;
+            interval = setInterval(() => {
+                if (timeRemaining <= 0) {
+                    clearInterval(interval);
+                    interval = null;
+                    document.getElementById("countdown").innerHTML = "Time's up!";
+                } else {
+                    timeRemaining--;
+                    updateCountdown();
+                }
+            }, 1000);
+            document.getElementById("start").disabled = true;
+            document.getElementById("stop").disabled = false;
+        }
+
+        function stopCountdown() {
+            clearInterval(interval);
+            interval = null;
+            document.getElementById("start").disabled = false;
+            document.getElementById("stop").disabled = true;
+        }
+
+        function resetCountdown() {
+            clearInterval(interval);
+            interval = null;
+            timeRemaining = countdownTime;
+            updateCountdown();
+            document.getElementById("start").disabled = false;
+            document.getElementById("stop").disabled = true;
+        }
+
+        function changeSettings() {
+            let newTime = prompt("Enter countdown time in seconds:", countdownTime);
+            if (newTime && !isNaN(newTime) && newTime > 0) {
+                countdownTime = parseInt(newTime);
+                timeRemaining = countdownTime;
+                resetCountdown();
+            }
+        }
+
+        document.getElementById("start").addEventListener("click", startCountdown);
+        document.getElementById("stop").addEventListener("click", stopCountdown);
+        document.getElementById("reset").addEventListener("click", resetCountdown);
+        document.getElementById("settings").addEventListener("click", changeSettings);
+
+        updateCountdown();
     </script>
 </body>
 </html>
