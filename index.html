@@ -8,11 +8,16 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             background-color: #f4f4f4;
+            flex-direction: column;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         #countdown {
             font-size: 2rem;
@@ -20,11 +25,17 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 150px;
+            text-align: center;
             margin-bottom: 20px;
         }
         .buttons {
             display: flex;
             gap: 10px;
+            justify-content: center;
         }
         button {
             padding: 10px 15px;
@@ -41,15 +52,17 @@
     </style>
 </head>
 <body>
-    <div id="countdown">3:00</div>
-    <div class="buttons">
-        <button id="start">Start</button>
-        <button id="stop" disabled>Stop</button>
-        <button id="reset">Reset</button>
-        <button id="settings">Settings</button>
+    <div class="container">
+        <div id="countdown">Loading...</div>
+        <div class="buttons">
+            <button id="start">Start</button>
+            <button id="stop" disabled>Stop</button>
+            <button id="reset">Reset</button>
+        </div>
     </div>
     <script>
-        let countdownTime = 180;
+        let urlParams = new URLSearchParams(window.location.search);
+        let countdownTime = parseInt(urlParams.get("time")) || 180; // Default 3 minutes
         let timeRemaining = countdownTime;
         let interval;
 
@@ -91,19 +104,9 @@
             document.getElementById("stop").disabled = true;
         }
 
-        function changeSettings() {
-            let newTime = prompt("Enter countdown time in seconds:", countdownTime);
-            if (newTime && !isNaN(newTime) && newTime > 0) {
-                countdownTime = parseInt(newTime);
-                timeRemaining = countdownTime;
-                resetCountdown();
-            }
-        }
-
         document.getElementById("start").addEventListener("click", startCountdown);
         document.getElementById("stop").addEventListener("click", stopCountdown);
         document.getElementById("reset").addEventListener("click", resetCountdown);
-        document.getElementById("settings").addEventListener("click", changeSettings);
 
         updateCountdown();
     </script>
